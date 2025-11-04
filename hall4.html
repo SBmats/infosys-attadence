@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Portal</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      min-height: 100vh; /* allow page to grow */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* start from top */
+      margin: 0;
+      color: #fff;
+      overflow-y: auto; /* enable scroll */
+      padding-top: 30px; /* space at top */
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    /* Stack roll numbers vertically */
+    .roll-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .roll-box {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 15px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 200px;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      width: 40px;
+      height: 20px;
+      appearance: none;
+      background: #ff4d4d;
+      border-radius: 10px;
+      position: relative;
+      outline: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    input[type="checkbox"]:checked {
+      background: #00c853;
+    }
+
+    input[type="checkbox"]::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 100%;
+      transition: 0.3s;
+    }
+
+    input[type="checkbox"]:checked::before {
+      transform: translateX(20px);
+    }
+
+    button {
+      background: #00c6ff;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0072ff;
+    }
+
+    .msg {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #d4ffb2;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Infosys Attendance B4</h2>
+
+    <div class="roll-container" id="rollContainer"></div>
+
+    <button id="submitBtn">Submit & Download Excel</button>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    // Roll numbers list (one line)
+    const rollNumbers = 
+    [
+    "22A21A0102",
+"22A21A0103",
+"22A21A0104",
+"22A21A0110",
+"22A21A0115",
+"22A21A0116",
+"22A21A0121",
+"22A21A0123",
+"22A21A0127",
+"22A21A0128",
+"22A21A0337",
+"22A21A1202",
+"22A21A1206",
+"22A21A1208",
+"22A21A1211",
+"22A21A1213",
+"22A21A1214",
+"22A21A1215",
+"22A21A1216",
+"22A21A1219",
+"22A21A1220",
+"22A21A1225",
+"22A21A1226",
+"22A21A1234",
+"22A21A1240",
+"22A21A1243",
+"22A21A1244",
+"22A21A1247",
+"22A21A1248",
+"22A21A1252",
+"22A21A6408",
+"22A21A6409",
+"22A21A6411",
+"22A21A6415",
+"22A21A6417",
+"22A21A6418",
+"22A21A6419",
+"22A21A6420",
+"24A21F0001",
+"24A21F0006",
+"24A21F0010",
+"24A21F0015",
+"24A21F0021",
+"24A21F0022",
+"24A21F0025",
+"24A21F0026",
+"24A21F0029",
+"24A21F0032",
+"24A21F0033",
+"24A21F0034",
+"24A21F0035",
+"24A21F0037",
+"24A21F003p",
+"24A21F0043",
+"24A21F0044",
+"24A21F0046",
+"24A21F0054",
+"24A21F0056",
+"24A21F0059",
+"24A21F0060",
+"24A21F0061",
+"24A21F0062",
+"24A21F0065",
+"24A21F0067",
+"24A21F0068",
+"24A21F0073",
+"24A21F0081",
+"24A21F0084",
+"24A21F0085",
+"24A21F0086",
+"24A21F0088",
+"24A21F0093",
+"24A21F0094",
+"24A21F0096",
+"24A21F0099",
+"24A21F00A6",
+"24A21F00A8",
+"24A21F00A9",
+"24A21F00B1",
+"24A21F00B2",
+"24A21F00B3",
+"24A21F00B5",
+"24A21F00B7",
+"24A21F00C4",
+"24A21F00C5",
+"24A21F00C6",
+"24A21F00C8",
+"24A21F00C9",
+"24A21F00D2",
+"24A21F00E3",
+"24A21F00F2",
+"24A21F00F8",
+"24A21F00G2",
+"24A21F00G5",
+"24A21F00G6",
+"24A21F00H2",
+"24A21F00H5",
+"24A21F00H8",
+"24A21F00H9",
+"24A21F00J1",
+"24A21F00J2",
+"24A21F00J5",
+"24A21F00J7",
+"24A21F00J9",
+"24A21F00k1",
+"24A21F00K2",
+"24A21F00K4",
+"24A21F00K5",
+"24A21F00L0",
+"24A21F00L1",
+"24A21F00L2",
+"24A21F00L3",
+"24A21F00L5",
+    
+    ];
+
+    const container = document.getElementById("rollContainer");
+
+    // Generate roll boxes
+    rollNumbers.forEach(roll => {
+      const box = document.createElement("div");
+      box.className = "roll-box";
+      box.innerHTML = `<label>${roll}</label><input type="checkbox" id="${roll}">`;
+      container.appendChild(box);
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const date = new Date().toLocaleDateString();
+      const attendanceData = rollNumbers.map(roll => ({
+        RollNumber: roll,
+        Status: document.getElementById(roll).checked ? "Present" : "Absent",
+        Date: date
+      }));
+
+      // Send to Google Sheets (replace URL)
+      const scriptURL = "https://script.google.com/macros/s/AKfycbx5wV_gkFY_s7wfa-Yyrdk5ysyfJF29GjEtSk9X8WwCK8vc4kvg8LKf1GHWOXFqFh4BIw/exec";
+      fetch(scriptURL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(attendanceData)
+      });
+
+      // Download Excel
+      const ws = XLSX.utils.json_to_sheet(attendanceData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+      XLSX.writeFile(wb, `Attendance_${date}.xlsx`);
+
+      const msg = document.getElementById("msg");
+      msg.textContent = "✅ Attendance Submitted & Excel Downloaded!";
+      setTimeout(() => msg.textContent = "", 4000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Portal</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      min-height: 100vh; /* allow page to grow */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* start from top */
+      margin: 0;
+      color: #fff;
+      overflow-y: auto; /* enable scroll */
+      padding-top: 30px; /* space at top */
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    /* Stack roll numbers vertically */
+    .roll-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .roll-box {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 15px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 200px;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      width: 40px;
+      height: 20px;
+      appearance: none;
+      background: #ff4d4d;
+      border-radius: 10px;
+      position: relative;
+      outline: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    input[type="checkbox"]:checked {
+      background: #00c853;
+    }
+
+    input[type="checkbox"]::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 100%;
+      transition: 0.3s;
+    }
+
+    input[type="checkbox"]:checked::before {
+      transform: translateX(20px);
+    }
+
+    button {
+      background: #00c6ff;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0072ff;
+    }
+
+    .msg {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #d4ffb2;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Infosys Attendance B1</h2>
+
+    <div class="roll-container" id="rollContainer"></div>
+
+    <button id="submitBtn">Submit & Download Excel</button>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    // Roll numbers list (one line)
+    const rollNumbers = 
+    [
+    "22A21A5402",
+"22A21A5407",
+"22A21A5409",
+"22A21A5410",
+"22A21A5412",
+"22A21A5413",
+"22A21A5414",
+"22A21A5415",
+"22A21A5422",
+"22A21A5430",
+"22A21A5432",
+"22A21A5435",
+"22A21A5437",
+"22A21A5438",
+"22A21A5441",
+"22A21A5445",
+"22A21A5446",
+"22A21A5447",
+"22A21A5448",
+"23A25A5408",
+"23A25A5409",
+"22A21A6103",
+"22A21A6107",
+"22A21A6111",
+"22A21A6112",
+"22A21A6113",
+"22A21A6114",
+"22A21A6119",
+"22A21A6122",
+"22A21A6126",
+"22A21A6127",
+"22A21A6128",
+"22A21A6129",
+"22A21A6130",
+"22A21A6132",
+"22A21A6133",
+"22A21A6135",
+"22A21A6138",
+"22A21A6141",
+"22A21A6142",
+"22A21A6143",
+"22A21A6144",
+"22A21A6148",
+"22A21A6149",
+"22A21A6156",
+"22A21A6158",
+"22A21A6163",
+"22A21A6164",
+"22A21A6167",
+"22A21A6168",
+"22A21A6169",
+"22A21A6170",
+"22A21A6171",
+"22A21A6175",
+"22A21A6180",
+"22A21A6183",
+"22A21A6184",
+"22A21A6186",
+"22A21A6188",
+"22A21A6190",
+"22A21A6195",
+"22A21A61A3",
+"22A21A61A5",
+"22A21A61A7",
+"22A21A61B1",
+"22A21A61B2",
+"22A21A61B3",
+"22A21A61B4",
+"22A21A61B6",
+"22A21A61B8",
+"23A25A6109",
+"23A25A6113",
+"22A21A6501",
+"22A21A6505",
+"22A21A6507",
+"22A21A6513",
+"22A21A6516",
+"22A21A6517",
+"22A21A6520",
+"22A21A6521",
+"22A21A6522",
+"22A21A6525",
+"22A21A6526",
+"22A21A6528",
+"22A21A6531",
+"22A21A6534",
+"22A21A6538",
+"22A21A6540",
+"22A21A6541",
+"22A21A6542",
+"22A21A6543",
+"22A21A6544",
+"22A21A6546",
+"22A21A6547",
+"22A21A4604",
+"22A21A4605",
+"22A21A4608",
+"22A21A4610",
+"22A21A4617",
+"22A21A4622",
+"22A21A4623",
+"22A21A4634",
+"22A21A4635",
+"22A21A4647",
+"22A21A4655",
+"22A21A4656",
+
+    ];
+
+    const container = document.getElementById("rollContainer");
+
+    // Generate roll boxes
+    rollNumbers.forEach(roll => {
+      const box = document.createElement("div");
+      box.className = "roll-box";
+      box.innerHTML = `<label>${roll}</label><input type="checkbox" id="${roll}">`;
+      container.appendChild(box);
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const date = new Date().toLocaleDateString();
+      const attendanceData = rollNumbers.map(roll => ({
+        RollNumber: roll,
+        Status: document.getElementById(roll).checked ? "Present" : "Absent",
+        Date: date
+      }));
+
+      // Send to Google Sheets (replace URL)
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyKM0UgnQTeeNE6zHym0WqOI56xUyRgx0URH_EsB8Gwou6fjj0CtoOJQI-Lg5ujBt0/exec";
+      fetch(scriptURL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(attendanceData)
+      });
+
+      // Download Excel
+      const ws = XLSX.utils.json_to_sheet(attendanceData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+      XLSX.writeFile(wb, `Attendance_${date}.xlsx`);
+
+      const msg = document.getElementById("msg");
+      msg.textContent = "✅ Attendance Submitted & Excel Downloaded!";
+      setTimeout(() => msg.textContent = "", 4000);
+    });
+  </script>
+</body>
+</html>
