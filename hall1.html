@@ -251,7 +251,7 @@
       const date = new Date().toLocaleDateString();
       const attendanceData = rollNumbers.map(roll => ({
         RollNumber: roll,
-        Status: document.getElementById(roll).checked ? "Present" : "Absent",
+        Status: document.getElementById(roll).checked ? "P" : "Absent",
         Date: date
       }));
 
@@ -277,3 +277,4 @@
   </script>
 </body>
 </html>
+
